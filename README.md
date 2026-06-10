@@ -717,7 +717,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, style guide, and PR process.
 
 Quick start:
 ```bash
-git clone https://github.com/yourname/ro-net.git
+git clone https://github.com/levicta/ro-net.git
 cd ro-net
 # Install luau-lsp and selene for type checking and linting
 ```
