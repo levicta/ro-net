@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Luau
+        uses: JohnnyMorganz/luau-lsp-action@v1
+        with:
+          args: --check src/
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Selene
+        uses: Kampfkarren/selene-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --display-style quiet src/
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify file structure
+        run: |
+          test -f src/init.lua
+          test -f src/Internal.lua
+          test -f src/Server.lua
+          test -f src/Client.lua
+          test -f src/Middleware.lua
+          test -f src/Validator.lua
+          test -f src/Promise.lua
+          test -f src/Bindable.lua
+          test -f src/Types.lua
+          test -f README.md
+          test -f LICENSE
+          echo "All required files present."

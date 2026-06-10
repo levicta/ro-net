@@ -1,0 +1,32 @@
+# Roblox / Luau
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.lock
+
+# Rojo
+/sourcemap.json
+/build/
+
+# Wally
+/Packages/
+/wally.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node (if using roblox-ts tools)
+node_modules/
+package-lock.json
+
+# Luau LSP
+types/

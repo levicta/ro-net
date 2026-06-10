@@ -1,0 +1,135 @@
+--!strict
+-- Namespace
+-- Scoped remote registry to prevent naming collisions in large projects.
+--
+-- Usage:
+--   local PlayerNet = Net.namespace("Player")
+--   PlayerNet.on("Damage", handler)      -- remote name: "Player.Damage"
+--   PlayerNet.fire("Damage", player, 10) -- fires "Player.Damage"
+
+local Internal = require(script.Parent.Internal)
+local Server = require(script.Parent.Server)
+local Client = require(script.Parent.Client)
+local Types = require(script.Parent.Types)
+
+local Namespace = {}
+Namespace.__index = Namespace
+
+export type Namespace = {
+	name: string,
+	on: (self: Namespace, remote: string, handler: (...any) -> (), middleware: Types.Middleware?) -> RBXScriptConnection?,
+	off: (self: Namespace, remote: string) -> (),
+	fire: (self: Namespace, remote: string, ...any) -> (),
+	fireAll: (self: Namespace, remote: string, ...any) -> (),
+	fireExcept: (self: Namespace, remote: string, exceptPlayer: Player, ...any) -> (),
+	onInvoke: (self: Namespace, remote: string, handler: (...any) -> any, middleware: Types.Middleware?) -> (),
+	invoke: (self: Namespace, remote: string, ...any) -> any,
+	invokeAsync: (self: Namespace, remote: string, timeout: number?, ...any) -> any,
+	define: (self: Namespace, remote: string, remoteType: Types.RemoteType) -> (RemoteEvent | RemoteFunction)?,
+	defineMany: (self: Namespace, definitions: {{name: string, type: Types.RemoteType}}) -> (),
+	isDefined: (self: Namespace, remote: string) -> boolean,
+}
+
+local function qualify(ns: string, name: string): string
+	return ns .. "." .. name
+end
+
+function Namespace.new(name: string): Namespace
+	local self = setmetatable({}, Namespace) :: any
+	self.name = name
+	return self :: Namespace
+end
+
+function Namespace:on(remote: string, handler: (...any) -> (), middleware: Types.Middleware?): RBXScriptConnection?
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		return Server.on(fullName, handler :: any, middleware)
+	else
+		return Client.on(fullName, handler, middleware)
+	end
+end
+
+function Namespace:off(remote: string)
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		Server.off(fullName)
+	else
+		Client.off(fullName)
+	end
+end
+
+function Namespace:fire(remote: string, ...)
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		Server.fire(fullName, ...)
+	else
+		Client.fire(fullName, ...)
+	end
+end
+
+function Namespace:fireAll(remote: string, ...)
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		Server.fireAll(fullName, ...)
+	else
+		warn(string.format("[RoNet] fireAll is server-only (namespace '%s')", self.name))
+	end
+end
+
+function Namespace:fireExcept(remote: string, exceptPlayer: Player, ...)
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		Server.fireExcept(fullName, exceptPlayer, ...)
+	else
+		warn(string.format("[RoNet] fireExcept is server-only (namespace '%s')", self.name))
+	end
+end
+
+function Namespace:onInvoke(remote: string, handler: (...any) -> any, middleware: Types.Middleware?)
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		Server.onInvoke(fullName, handler :: any, middleware)
+	else
+		Client.onInvoke(fullName, handler)
+	end
+end
+
+function Namespace:invoke(remote: string, ...): any
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		return Server.invoke(fullName, ...)
+	else
+		return Client.invoke(fullName, ...)
+	end
+end
+
+function Namespace:invokeAsync(remote: string, timeout: number?, ...): any
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		return Server.invokeAsync(fullName, timeout, ...)
+	else
+		return Client.invokeAsync(fullName, timeout, ...)
+	end
+end
+
+function Namespace:define(remote: string, remoteType: Types.RemoteType): (RemoteEvent | RemoteFunction)?
+	if not Internal.isServer then
+		warn(string.format("[RoNet] define is server-only (namespace '%s')", self.name))
+		return nil
+	end
+	local fullName = qualify(self.name, remote)
+	return Internal.createRemote(fullName, remoteType)
+end
+
+function Namespace:defineMany(definitions: {{name: string, type: Types.RemoteType}})
+	if not Internal.isServer then return end
+	for _, def in ipairs(definitions) do
+		Internal.createRemote(qualify(self.name, def.name), def.type)
+	end
+end
+
+function Namespace:isDefined(remote: string): boolean
+	return Internal.isDefined(qualify(self.name, remote))
+end
+
+return Namespace

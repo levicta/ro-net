@@ -1,0 +1,10 @@
+[package]
+name = "levicta/ro-net"
+version = "0.1.0"
+description = "A clean, intuitive networking framework for Roblox."
+license = "MIT"
+authors = ["Your Name"]
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
