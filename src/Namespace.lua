@@ -13,6 +13,7 @@ local Client = require(script.Parent.Client)
 local Types = require(script.Parent.Types)
 local Observable = require(script.Parent.Observable)
 local PlayerObservable = require(script.Parent.PlayerObservable)
+local TeamObservable = require(script.Parent.TeamObservable)
 
 local Namespace = {}
 Namespace.__index = Namespace
@@ -37,6 +38,7 @@ export type Namespace = {
 	fireBatchAll: (self: Namespace, events: {Types.BatchEvent}) -> (),
 	fireBatchExcept: (self: Namespace, exceptPlayer: Player, events: {Types.BatchEvent}) -> (),
 	playerObservable: (self: Namespace, remote: string, initialValue: any) -> PlayerObservable.PlayerObservable<any>,
+	teamObservable: (self: Namespace, remote: string, initialValue: any) -> TeamObservable.TeamObservable<any>,
 }
 
 local function qualify(ns: string, name: string): string
@@ -200,6 +202,11 @@ end
 function Namespace:playerObservable(remote: string, initialValue: any): PlayerObservable.PlayerObservable<any>
 	local fullName = qualify(self.name, remote)
 	return PlayerObservable.new(fullName, initialValue)
+end
+
+function Namespace:teamObservable(remote: string, initialValue: any): TeamObservable.TeamObservable<any>
+	local fullName = qualify(self.name, remote)
+	return TeamObservable.new(fullName, initialValue)
 end
 
 return Namespace

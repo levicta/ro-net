@@ -1,8 +1,21 @@
-# RoNet v1.3.0
+# RoNet v1.4.0
 
-**Adds per-player observable state synchronization.**
+**Adds per-team observable state synchronization.**
 
 ## What's New
+
+### Added (v1.4.0)
+- **`Net.teamObservable(name, initialValue)`** — Reactive state that stores a separate value per-team and auto-syncs only to members of that team
+  - `:set(team, value)` — Update and send only to that team's members
+  - `:get(team)` — Read cached value for a specific team
+  - `:onChange(callback)` — React to updates (server: `callback(team, newValue)`, client: `callback(newValue)`)
+  - `:destroy()` — Cleanup
+- Auto-sync on team join: new players and players switching teams immediately receive their team's cached value
+- Auto-evict on team leave: player is removed from old team's member list when they switch or disconnect
+- New team creation: `Teams.ChildAdded` initializes new teams with `initialValue`
+- Team removal: `Teams.ChildRemoved` cleans up team state
+- Client-side `.set()` support: clients can request their team's value update via `FireServer`
+- Namespace support: `Game:teamObservable("TeamScore", 0)`
 
 ### Added (v1.3.0)
 - **`Net.playerObservable(name, initialValue)`** — Reactive state that stores a separate value per-player and auto-syncs only to that player
@@ -65,7 +78,7 @@ git clone https://github.com/levicta/ro-net.git
 
 **Wally:**
 ```toml
-ro-net = "levicta/ro-net@1.3.0"
+ro-net = "levicta/ro-net@1.4.0"
 ```
 
 ## Quick Start
@@ -74,13 +87,13 @@ ro-net = "levicta/ro-net@1.3.0"
 local Net = require(ReplicatedStorage.RoNet)
 
 -- Server
-local Health = Net.playerObservable("PlayerHealth", 100)
-Health:set(player, 75)
+local TeamScore = Net.teamObservable("TeamScore", 0)
+TeamScore:set(team, 150)
 
 -- Client
-local Health = Net.playerObservable("PlayerHealth", 100)
-Health:onChange(function(newVal)
-    healthBar.Value = newVal
+local TeamScore = Net.teamObservable("TeamScore", 0)
+TeamScore:onChange(function(newVal)
+    updateTeamUI(newVal)
 end)
 ```
 

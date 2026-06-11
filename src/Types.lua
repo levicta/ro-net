@@ -49,6 +49,21 @@ export type PlayerObservable<T> = {
 	_cache: {[number]: any}?,
 }
 
+export type TeamObservable<T> = {
+	name: string,
+	initialValue: T,
+	onChangeCallbacks: {(...any) -> ()},
+	connection: RBXScriptConnection?,
+	teamAddedConnection: RBXScriptConnection?,
+	teamRemovedConnection: RBXScriptConnection?,
+	playerAddedConnection: RBXScriptConnection?,
+	playerRemovingConnection: RBXScriptConnection?,
+	_teamValues: {[string]: any}?,
+	_teamMembers: {[string]: {Player}}?,
+	_playerTeams: {[Player]: Team}?,
+	_teamConnections: {[Player]: RBXScriptConnection}?,
+}
+
 export type BatchEvent = {
 	name: string,
 	args: {any},

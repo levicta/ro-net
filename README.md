@@ -213,6 +213,34 @@ local Game = Net.namespace("Game")
 local Score = Game:playerObservable("TeamScore", 0)
 ```
 
+#### `Net.teamObservable(name, initialValue)`
+Create a reactive state variable that stores a separate value per-team and auto-syncs only to members of that team (including on join/switch).
+
+**Server:**
+```lua
+local TeamScore = Net.teamObservable("TeamScore", 0)
+TeamScore:set(team, 150)
+TeamScore:get(team) -- 150
+TeamScore:onChange(function(team, newVal)
+    print(team.Name .. " score: " .. newVal)
+end)
+```
+
+**Client:**
+```lua
+local TeamScore = Net.teamObservable("TeamScore", 0)
+print(TeamScore:get()) -- 0 (initial value until first sync)
+TeamScore:onChange(function(newVal)
+    updateTeamUI(newVal)
+end)
+```
+
+With namespaces:
+```lua
+local Game = Net.namespace("Game")
+local TeamScore = Game:teamObservable("TeamScore", 0)
+```
+
 #### `Net.fireBatch(player, events)` / `Net.fireBatchAll(events)` / `Net.fireBatchExcept(exceptPlayer, events)` *(Server only)*
 Send multiple different events in a single network call to reduce per-RemoteEvent overhead.
 
@@ -792,6 +820,7 @@ ro-net/
 │   ├── Zone.lua          -- Spatial zone filtering for interest management
 │   ├── Observable.lua    -- Reactive state synchronization helpers
 │   ├── PlayerObservable.lua -- Per-player reactive state synchronization
+│   ├── TeamObservable.lua -- Per-team reactive state synchronization
 │   └── Batch.lua         -- Batch multiple events into a single network call
 ├── examples/             -- Working examples for every feature
 ├── tests/                -- Studio test runner

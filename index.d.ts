@@ -25,6 +25,13 @@ declare namespace RoNet {
 		destroy(): void;
 	}
 
+	export interface TeamObservable<T = any> {
+		set(team: Team, value: T): void;
+		get(team?: Team): T;
+		onChange(callback: (team: Team, value: T) => void): void;
+		destroy(): void;
+	}
+
 	export interface BatchEvent {
 		name: string;
 		args: Array<unknown>;
@@ -96,6 +103,10 @@ declare namespace RoNet {
 	export namespace PlayerObservableStatic {
 		function create<T>(name: string, initialValue: T): RoNet.PlayerObservable<T>;
 	}
+
+	export namespace TeamObservableStatic {
+		function create<T>(name: string, initialValue: T): RoNet.TeamObservable<T>;
+	}
 }
 
 // Server API
@@ -110,9 +121,11 @@ interface RoNetServer {
 	readonly Zone: typeof RoNet.Zone;
 	readonly Observable: typeof RoNet.ObservableStatic;
 	readonly PlayerObservable: typeof RoNet.PlayerObservableStatic;
+	readonly TeamObservable: typeof RoNet.TeamObservableStatic;
 
 	readonly observable: <T>(name: string, initialValue: T) => RoNet.Observable<T>;
 	readonly playerObservable: <T>(name: string, initialValue: T) => RoNet.PlayerObservable<T>;
+	readonly teamObservable: <T>(name: string, initialValue: T) => RoNet.TeamObservable<T>;
 
 	configure(config: RoNet.Config): void;
 
@@ -146,9 +159,11 @@ interface RoNetClient {
 	readonly Zone: typeof RoNet.Zone;
 	readonly Observable: typeof RoNet.ObservableStatic;
 	readonly PlayerObservable: typeof RoNet.PlayerObservableStatic;
+	readonly TeamObservable: typeof RoNet.TeamObservableStatic;
 
 	readonly observable: <T>(name: string, initialValue: T) => RoNet.Observable<T>;
 	readonly playerObservable: <T>(name: string, initialValue: T) => RoNet.PlayerObservable<T>;
+	readonly teamObservable: <T>(name: string, initialValue: T) => RoNet.TeamObservable<T>;
 
 	configure(config: RoNet.Config): void;
 

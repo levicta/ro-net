@@ -30,6 +30,7 @@ local Profiler = require(script.Profiler)
 local Zone = require(script.Zone)
 local Observable = require(script.Observable)
 local PlayerObservable = require(script.PlayerObservable)
+local TeamObservable = require(script.TeamObservable)
 local Batch = require(script.Batch)
 
 Batch.init()
@@ -51,6 +52,7 @@ RoNet.Profiler = Profiler
 RoNet.Zone = Zone
 RoNet.Observable = Observable
 RoNet.PlayerObservable = PlayerObservable
+RoNet.TeamObservable = TeamObservable
 RoNet.Batch = Batch
 
 -- Configuration
@@ -114,6 +116,11 @@ end
 -- PlayerObservable factory
 function RoNet.playerObservable(name: string, initialValue: any): PlayerObservable.PlayerObservable<any>
 	return PlayerObservable.new(name, initialValue)
+end
+
+-- TeamObservable factory
+function RoNet.teamObservable(name: string, initialValue: any): TeamObservable.TeamObservable<any>
+	return TeamObservable.new(name, initialValue)
 end
 
 -- Context-aware unified API
