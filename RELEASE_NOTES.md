@@ -1,8 +1,14 @@
-# RoNet v1.1.0
+# RoNet v1.2.0
 
-**Adds reactive state synchronization helpers (Observables).**
+**Adds batch firing (Net.fireBatch) to reduce per-event network overhead.**
 
 ## What's New
+
+### Added (v1.2.0)
+- **`Net.fireBatch(player, events)`** — Send multiple different events to one player in a single network call
+- **`Net.fireBatchAll(events)`** — Broadcast a batch to all players
+- **`Net.fireBatchExcept(exceptPlayer, events)`** — Broadcast a batch to all except one
+- Namespace support: `Combat:fireBatch(player, {...})`
 
 ### Added (v1.1.0)
 - **`Net.observable(name, initialValue)`** — Reactive state that auto-syncs to all clients (including new joiners)
@@ -48,7 +54,7 @@ git clone https://github.com/levicta/ro-net.git
 
 **Wally:**
 ```toml
-ro-net = "levicta/ro-net@1.1.0"
+ro-net = "levicta/ro-net@1.2.0"
 ```
 
 ## Quick Start
@@ -57,14 +63,10 @@ ro-net = "levicta/ro-net@1.1.0"
 local Net = require(ReplicatedStorage.RoNet)
 
 -- Server
-local Round = Net.observable("RoundNumber", 0)
-Round:set(3)
-
--- Client
-local Round = Net.observable("RoundNumber", 0)
-Round:onChange(function(newRound)
-    updateUI(newRound)
-end)
+Net.fireBatch(player, {
+    {"HealthChanged", 75},
+    {"PositionChanged", Vector3.new(10, 5, 20)},
+})
 ```
 
 ## Full Changelog
