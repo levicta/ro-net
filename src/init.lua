@@ -29,6 +29,7 @@ local Serializer = require(script.Serializer)
 local Profiler = require(script.Profiler)
 local Zone = require(script.Zone)
 local Observable = require(script.Observable)
+local PlayerObservable = require(script.PlayerObservable)
 local Batch = require(script.Batch)
 
 Batch.init()
@@ -49,6 +50,7 @@ RoNet.Serializer = Serializer
 RoNet.Profiler = Profiler
 RoNet.Zone = Zone
 RoNet.Observable = Observable
+RoNet.PlayerObservable = PlayerObservable
 RoNet.Batch = Batch
 
 -- Configuration
@@ -107,6 +109,11 @@ end
 -- Observable factory
 function RoNet.observable(name: string, initialValue: any): Observable.Observable<any>
 	return Observable.new(name, initialValue)
+end
+
+-- PlayerObservable factory
+function RoNet.playerObservable(name: string, initialValue: any): PlayerObservable.PlayerObservable<any>
+	return PlayerObservable.new(name, initialValue)
 end
 
 -- Context-aware unified API

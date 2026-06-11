@@ -1,8 +1,19 @@
-# RoNet v1.2.0
+# RoNet v1.3.0
 
-**Adds batch firing (Net.fireBatch) to reduce per-event network overhead.**
+**Adds per-player observable state synchronization.**
 
 ## What's New
+
+### Added (v1.3.0)
+- **`Net.playerObservable(name, initialValue)`** — Reactive state that stores a separate value per-player and auto-syncs only to that player
+  - `:set(player, value)` — Update and send only to that player
+  - `:get(player)` — Read cached value for a specific player
+  - `:onChange(callback)` — React to updates (server: `callback(player, newValue)`, client: `callback(newValue)`)
+  - `:destroy()` — Cleanup
+- Auto-sync on join: new players immediately receive their own cached value
+- Auto-evict on leave: player state is garbage-collected when they disconnect
+- Client-side `.set()` support: clients can request their own value update via `FireServer`
+- Namespace support: `Game:playerObservable("TeamScore", 0)`
 
 ### Added (v1.2.0)
 - **`Net.fireBatch(player, events)`** — Send multiple different events to one player in a single network call
@@ -54,7 +65,7 @@ git clone https://github.com/levicta/ro-net.git
 
 **Wally:**
 ```toml
-ro-net = "levicta/ro-net@1.2.0"
+ro-net = "levicta/ro-net@1.3.0"
 ```
 
 ## Quick Start
@@ -63,10 +74,14 @@ ro-net = "levicta/ro-net@1.2.0"
 local Net = require(ReplicatedStorage.RoNet)
 
 -- Server
-Net.fireBatch(player, {
-    {"HealthChanged", 75},
-    {"PositionChanged", Vector3.new(10, 5, 20)},
-})
+local Health = Net.playerObservable("PlayerHealth", 100)
+Health:set(player, 75)
+
+-- Client
+local Health = Net.playerObservable("PlayerHealth", 100)
+Health:onChange(function(newVal)
+    healthBar.Value = newVal
+end)
 ```
 
 ## Full Changelog

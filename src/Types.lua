@@ -39,6 +39,16 @@ export type Observable<T> = {
 	playerAddedConnection: RBXScriptConnection?,
 }
 
+export type PlayerObservable<T> = {
+	name: string,
+	initialValue: T,
+	onChangeCallbacks: {(...any) -> ()},
+	connection: RBXScriptConnection?,
+	playerAddedConnection: RBXScriptConnection?,
+	playerRemovingConnection: RBXScriptConnection?,
+	_cache: {[number]: any}?,
+}
+
 export type BatchEvent = {
 	name: string,
 	args: {any},

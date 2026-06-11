@@ -185,6 +185,34 @@ local Game = Net.namespace("Game")
 local Round = Game:observable("RoundNumber", 0)
 ```
 
+#### `Net.playerObservable(name, initialValue)`
+Create a reactive state variable that stores a separate value per-player and auto-syncs only to that player (including on join).
+
+**Server:**
+```lua
+local Health = Net.playerObservable("PlayerHealth", 100)
+Health:set(player, 75)
+Health:get(player) -- 75
+Health:onChange(function(player, newVal)
+    print(player.Name .. " health: " .. newVal)
+end)
+```
+
+**Client:**
+```lua
+local Health = Net.playerObservable("PlayerHealth", 100)
+print(Health:get()) -- 100 (initial value until first sync)
+Health:onChange(function(newVal)
+    healthBar.Value = newVal
+end)
+```
+
+With namespaces:
+```lua
+local Game = Net.namespace("Game")
+local Score = Game:playerObservable("TeamScore", 0)
+```
+
 #### `Net.fireBatch(player, events)` / `Net.fireBatchAll(events)` / `Net.fireBatchExcept(exceptPlayer, events)` *(Server only)*
 Send multiple different events in a single network call to reduce per-RemoteEvent overhead.
 
@@ -763,6 +791,7 @@ ro-net/
 │   ├── Types.lua         -- Luau type definitions
 │   ├── Zone.lua          -- Spatial zone filtering for interest management
 │   ├── Observable.lua    -- Reactive state synchronization helpers
+│   ├── PlayerObservable.lua -- Per-player reactive state synchronization
 │   └── Batch.lua         -- Batch multiple events into a single network call
 ├── examples/             -- Working examples for every feature
 ├── tests/                -- Studio test runner

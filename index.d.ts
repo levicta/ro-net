@@ -18,6 +18,13 @@ declare namespace RoNet {
 		destroy(): void;
 	}
 
+	export interface PlayerObservable<T = any> {
+		set(player: Player, value: T): void;
+		get(player?: Player): T;
+		onChange(callback: (player: Player, value: T) => void): void;
+		destroy(): void;
+	}
+
 	export interface BatchEvent {
 		name: string;
 		args: Array<unknown>;
@@ -85,6 +92,10 @@ declare namespace RoNet {
 	export namespace ObservableStatic {
 		function create<T>(name: string, initialValue: T): RoNet.Observable<T>;
 	}
+
+	export namespace PlayerObservableStatic {
+		function create<T>(name: string, initialValue: T): RoNet.PlayerObservable<T>;
+	}
 }
 
 // Server API
@@ -98,8 +109,10 @@ interface RoNetServer {
 	readonly Bindable: typeof RoNet.Bindable;
 	readonly Zone: typeof RoNet.Zone;
 	readonly Observable: typeof RoNet.ObservableStatic;
+	readonly PlayerObservable: typeof RoNet.PlayerObservableStatic;
 
 	readonly observable: <T>(name: string, initialValue: T) => RoNet.Observable<T>;
+	readonly playerObservable: <T>(name: string, initialValue: T) => RoNet.PlayerObservable<T>;
 
 	configure(config: RoNet.Config): void;
 
@@ -132,8 +145,10 @@ interface RoNetClient {
 	readonly Bindable: typeof RoNet.Bindable;
 	readonly Zone: typeof RoNet.Zone;
 	readonly Observable: typeof RoNet.ObservableStatic;
+	readonly PlayerObservable: typeof RoNet.PlayerObservableStatic;
 
 	readonly observable: <T>(name: string, initialValue: T) => RoNet.Observable<T>;
+	readonly playerObservable: <T>(name: string, initialValue: T) => RoNet.PlayerObservable<T>;
 
 	configure(config: RoNet.Config): void;
 
