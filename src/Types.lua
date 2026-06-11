@@ -25,6 +25,11 @@ export type HandlerEntry = {
 	connection: RBXScriptConnection?,
 }
 
+export type Zone = {
+	origin: Vector3,
+	radius: number,
+}
+
 export type Config = {
 	strictMode: boolean?,
 	defaultTimeout: number?,

@@ -6,6 +6,11 @@ declare namespace RoNet {
 	export type RemoteType = "Event" | "Function";
 	export type Direction = "incoming" | "outgoing";
 
+	export interface ZoneData {
+		readonly origin: Vector3;
+		readonly radius: number;
+	}
+
 	export interface Context {
 		readonly player: Player | undefined;
 		readonly remote: string;
@@ -56,6 +61,14 @@ declare namespace RoNet {
 		function resolve<T>(value: T): Promise<T>;
 		function reject<T>(reason: string): Promise<T>;
 	}
+
+	export namespace Zone {
+		function fromPosition(origin: Vector3, radius: number): ZoneData;
+		function fromCFrame(cframe: CFrame, radius: number): ZoneData;
+		function fromPart(part: BasePart, radius: number): ZoneData;
+		function isPlayerInZone(player: Player, zoneData: ZoneData): boolean;
+		function getPlayersInZone(zoneData: ZoneData): Array<Player>;
+	}
 }
 
 // Server API
@@ -67,6 +80,7 @@ interface RoNetServer {
 	readonly Types: typeof RoNet;
 	readonly Promise: typeof RoNet.PromiseStatic;
 	readonly Bindable: typeof RoNet.Bindable;
+	readonly Zone: typeof RoNet.Zone;
 
 	configure(config: RoNet.Config): void;
 
@@ -75,6 +89,8 @@ interface RoNetServer {
 	fire(name: string, player: Player, ...args: Array<unknown>): void;
 	fireAll(name: string, ...args: Array<unknown>): void;
 	fireExcept(name: string, exceptPlayer: Player, ...args: Array<unknown>): void;
+	fireInZone(name: string, zoneData: RoNet.ZoneData, ...args: Array<unknown>): void;
+	fireExceptInZone(name: string, zoneData: RoNet.ZoneData, exceptPlayer: Player, ...args: Array<unknown>): void;
 	onInvoke(name: string, handler: (player: Player, ...args: Array<unknown>) => unknown, middleware?: RoNet.Middleware): void;
 	invoke<T>(name: string, player: Player, ...args: Array<unknown>): T | undefined;
 	invokeAsync<T>(name: string, player: Player, timeout?: number, ...args: Array<unknown>): RoNet.Promise<T>;
@@ -92,6 +108,7 @@ interface RoNetClient {
 	readonly Types: typeof RoNet;
 	readonly Promise: typeof RoNet.PromiseStatic;
 	readonly Bindable: typeof RoNet.Bindable;
+	readonly Zone: typeof RoNet.Zone;
 
 	configure(config: RoNet.Config): void;
 

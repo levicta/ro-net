@@ -1,6 +1,6 @@
 [package]
 name = "levicta/ro-net"
-version = "0.1.0"
+version = "1.0.1"
 description = "A clean, intuitive networking framework for Roblox."
 license = "MIT"
 authors = ["Your Name"]

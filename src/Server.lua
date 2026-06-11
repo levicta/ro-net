@@ -12,6 +12,7 @@ local Profiler = require(script.Parent.Profiler)
 local Server = {}
 local eventHandlers: {[string]: Types.HandlerEntry} = {}
 local invokeHandlers: {[string]: Types.HandlerEntry} = {}
+local Zone = require(script.Parent.Zone)
 
 local function parseMiddleware(middleware: Types.Middleware?): {Types.MiddlewareFn}
 	local list: {Types.MiddlewareFn} = {}
@@ -138,6 +139,60 @@ function Server.fireExcept(name: string, exceptPlayer: Player, ...)
 
 	local payload = {...}
 	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= exceptPlayer then
+			local context: Types.Context = {
+				player = player,
+				remote = name,
+				payload = payload,
+				direction = "outgoing",
+			}
+
+			pcall(function()
+				Middleware.run(context, {}, function()
+					remote:FireClient(player, table.unpack(payload))
+				end)
+			end)
+		end
+	end
+end
+
+function Server.fireInZone(name: string, zoneData: Types.Zone, ...)
+	local remote = Internal.getRemote(name) :: RemoteEvent?
+	if not remote then
+		warn(string.format("[RoNet] Cannot fireInZone '%s': remote not found", name))
+		return
+	end
+
+	local payload = {...}
+	local zone = Zone.fromPosition(zoneData.origin, zoneData.radius)
+
+	for _, player in ipairs(Zone.getPlayersInZone(zone)) do
+		local context: Types.Context = {
+			player = player,
+			remote = name,
+			payload = payload,
+			direction = "outgoing",
+		}
+
+		pcall(function()
+			Middleware.run(context, {}, function()
+				remote:FireClient(player, table.unpack(payload))
+			end)
+		end)
+	end
+end
+
+function Server.fireExceptInZone(name: string, zoneData: Types.Zone, exceptPlayer: Player, ...)
+	local remote = Internal.getRemote(name) :: RemoteEvent?
+	if not remote then
+		warn(string.format("[RoNet] Cannot fireExceptInZone '%s': remote not found", name))
+		return
+	end
+
+	local payload = {...}
+	local zone = Zone.fromPosition(zoneData.origin, zoneData.radius)
+
+	for _, player in ipairs(Zone.getPlayersInZone(zone)) do
 		if player ~= exceptPlayer then
 			local context: Types.Context = {
 				player = player,

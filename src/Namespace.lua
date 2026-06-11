@@ -22,6 +22,8 @@ export type Namespace = {
 	fire: (self: Namespace, remote: string, ...any) -> (),
 	fireAll: (self: Namespace, remote: string, ...any) -> (),
 	fireExcept: (self: Namespace, remote: string, exceptPlayer: Player, ...any) -> (),
+	fireInZone: (self: Namespace, remote: string, zoneData: Types.Zone, ...any) -> (),
+	fireExceptInZone: (self: Namespace, remote: string, zoneData: Types.Zone, exceptPlayer: Player, ...any) -> (),
 	onInvoke: (self: Namespace, remote: string, handler: (...any) -> any, middleware: Types.Middleware?) -> (),
 	invoke: (self: Namespace, remote: string, ...any) -> any,
 	invokeAsync: (self: Namespace, remote: string, timeout: number?, ...any) -> any,
@@ -82,6 +84,24 @@ function Namespace:fireExcept(remote: string, exceptPlayer: Player, ...)
 		Server.fireExcept(fullName, exceptPlayer, ...)
 	else
 		warn(string.format("[RoNet] fireExcept is server-only (namespace '%s')", self.name))
+	end
+end
+
+function Namespace:fireInZone(remote: string, zoneData: Types.Zone, ...)
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		Server.fireInZone(fullName, zoneData, ...)
+	else
+		warn(string.format("[RoNet] fireInZone is server-only (namespace '%s')", self.name))
+	end
+end
+
+function Namespace:fireExceptInZone(remote: string, zoneData: Types.Zone, exceptPlayer: Player, ...)
+	local fullName = qualify(self.name, remote)
+	if Internal.isServer then
+		Server.fireExceptInZone(fullName, zoneData, exceptPlayer, ...)
+	else
+		warn(string.format("[RoNet] fireExceptInZone is server-only (namespace '%s')", self.name))
 	end
 end
 

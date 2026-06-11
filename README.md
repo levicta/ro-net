@@ -131,6 +131,33 @@ Fire to all players except one.
 Net.fireExcept("ChatMessage", sender, sender.Name, message)
 ```
 
+#### `Net.fireInZone(name, zoneData, ...)` *(Server only)*
+Fire only to players within a spatial zone (interest management).
+
+```lua
+local zone = Net.Zone.fromPosition(Vector3.new(0, 10, 0), 50)
+Net.fireInZone("MinigameEffect", zone, "boost")
+```
+
+#### `Net.fireExceptInZone(name, zoneData, exceptPlayer, ...)` *(Server only)*
+Fire to all players in a zone except one.
+
+```lua
+local zone = Net.Zone.fromPart(workspace.Arena.PrimaryPart, 100)
+Net.fireExceptInZone("AreaDamage", zone, attacker, damageType)
+```
+
+#### `Net.Zone`
+```lua
+local zone = Net.Zone.fromPosition(Vector3.new(0, 10, 0), 50)
+local zone = Net.Zone.fromCFrame(CFrame.new(0, 10, 0), 50)
+local zone = Net.Zone.fromPart(workspace.Minigame.PrimaryPart, 30)
+
+-- Query membership
+local players = Net.Zone.getPlayersInZone(zone)
+local inZone = Net.Zone.isPlayerInZone(player, zone)
+```
+
 #### `Net.onInvoke(name, handler, middleware?)`
 Handle a RemoteFunction invocation.
 
@@ -677,7 +704,8 @@ ro-net/
 │   ├── Utilities.lua     -- once() and wait() helpers
 │   ├── Serializer.lua    -- Roblox type serialization
 │   ├── Profiler.lua      -- Network performance metrics
-│   └── Types.lua         -- Luau type definitions
+│   ├── Types.lua         -- Luau type definitions
+│   └── Zone.lua          -- Spatial zone filtering for interest management
 ├── examples/             -- Working examples for every feature
 ├── tests/                -- Studio test runner
 ├── demo/                 -- Full working game demo

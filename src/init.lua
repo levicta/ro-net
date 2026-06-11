@@ -27,6 +27,7 @@ local Namespace = require(script.Namespace)
 local Utilities = require(script.Utilities)
 local Serializer = require(script.Serializer)
 local Profiler = require(script.Profiler)
+local Zone = require(script.Zone)
 
 local RoNet = {}
 
@@ -42,6 +43,7 @@ RoNet.Namespace = Namespace
 RoNet.Utilities = Utilities
 RoNet.Serializer = Serializer
 RoNet.Profiler = Profiler
+RoNet.Zone = Zone
 
 -- Configuration
 function RoNet.configure(config: Types.Config)
@@ -116,6 +118,14 @@ if Internal.isServer then
 
 	function RoNet.fireExcept(name: string, exceptPlayer: Player, ...)
 		return Server.fireExcept(name, exceptPlayer, ...)
+	end
+
+	function RoNet.fireInZone(name: string, zoneData: Types.Zone, ...)
+		return Server.fireInZone(name, zoneData, ...)
+	end
+
+	function RoNet.fireExceptInZone(name: string, zoneData: Types.Zone, exceptPlayer: Player, ...)
+		return Server.fireExceptInZone(name, zoneData, exceptPlayer, ...)
 	end
 
 	function RoNet.onInvoke(name: string, handler: (player: Player, ...any) -> any, middleware: Types.Middleware?)
