@@ -32,6 +32,7 @@ local Observable = require(script.Observable)
 local PlayerObservable = require(script.PlayerObservable)
 local TeamObservable = require(script.TeamObservable)
 local Computed = require(script.Computed)
+local Channel = require(script.Channel)
 local Batch = require(script.Batch)
 
 Batch.init()
@@ -55,6 +56,7 @@ RoNet.Observable = Observable
 RoNet.PlayerObservable = PlayerObservable
 RoNet.TeamObservable = TeamObservable
 RoNet.Computed = Computed
+RoNet.Channel = Channel
 RoNet.Batch = Batch
 
 -- Configuration
@@ -138,6 +140,11 @@ end
 -- TeamComputed factory
 function RoNet.teamComputed(name: string, fn: (...any) -> any, dependencies: {any}): Computed.Computed<any>
 	return Computed.team(name, fn, dependencies)
+end
+
+-- Channel factory
+function RoNet.channel(name: string): Channel.Channel
+	return Channel.new(name)
 end
 
 -- Context-aware unified API

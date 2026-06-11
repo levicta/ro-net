@@ -1,8 +1,20 @@
-# RoNet v1.5.0
+# RoNet v1.6.0
 
-**Adds derived/computed observables for reactive state architecture.**
+**Adds generic channel-based subscription rooms for arbitrary player grouping.**
 
 ## What's New
+
+### Added (v1.6.0)
+- **`Net.channel(name)`** — Create or get a named channel for arbitrary player grouping
+  - `:join(player)` — Add a player to the channel
+  - `:leave(player)` — Remove a player from the channel
+  - `:has(player)` — Check if a player is in the channel
+  - `:getPlayers()` — Get all channel members
+  - `:fire(name, ...)` — Fire an event to all channel members
+  - `:fireExcept(name, exceptPlayer, ...)` — Fire to all except one
+  - `:destroy()` — Cleanup
+- Auto-evict on player leave: `Players.PlayerRemoving` removes players from all channels
+- Namespace support: `namespace:channel(name)`
 
 ### Added (v1.5.0)
 - **`Net.computed(name, fn, dependencies)`** — Read-only global observable that auto-recalculates when dependencies change
@@ -87,7 +99,7 @@ git clone https://github.com/levicta/ro-net.git
 
 **Wally:**
 ```toml
-ro-net = "levicta/ro-net@1.5.0"
+ro-net = "levicta/ro-net@1.6.0"
 ```
 
 ## Quick Start
@@ -95,17 +107,9 @@ ro-net = "levicta/ro-net@1.5.0"
 ```lua
 local Net = require(ReplicatedStorage.RoNet)
 
-local RedScore = Net.observable("RedScore", 0)
-local BlueScore = Net.observable("BlueScore", 0)
-local TotalScore = Net.computed("TotalScore", function(red, blue)
-    return red + blue
-end, {RedScore, BlueScore})
-
-TotalScore:onChange(function(total)
-    print("Total score:", total)
-end)
-
-RedScore:set(10) -- TotalScore auto-recalculates
+local lobby = Net.channel("lobby")
+lobby:join(player)
+lobby:fire("ChatMessage", player.Name, "Welcome!")
 ```
 
 ## Full Changelog

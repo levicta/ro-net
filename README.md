@@ -282,6 +282,22 @@ end, {TeamAttack, TeamDefense})
 TeamPower:get(team)
 ```
 
+#### `Net.channel(name)`
+Create or get a named channel for arbitrary player grouping. Channels are not tied to Roblox Teams or spatial zones.
+
+```lua
+local lobby = Net.channel("lobby")
+local dungeon = Net.channel("dungeon-1")
+
+lobby:join(player)
+lobby:leave(player)
+lobby:has(player)          -- boolean
+lobby:getPlayers()         -- {Player}
+
+lobby:fire("ChatMessage", player.Name, message)
+lobby:fireExcept("PrivateMsg", excludedPlayer, data)
+```
+
 #### `Net.fireBatch(player, events)` / `Net.fireBatchAll(events)` / `Net.fireBatchExcept(exceptPlayer, events)` *(Server only)*
 Send multiple different events in a single network call to reduce per-RemoteEvent overhead.
 
@@ -863,6 +879,7 @@ ro-net/
 │   ├── PlayerObservable.lua -- Per-player reactive state synchronization
 │   ├── TeamObservable.lua -- Per-team reactive state synchronization
 │   ├── Computed.lua      -- Derived/computed observable helpers
+│   ├── Channel.lua       -- Scoped subscription rooms for arbitrary grouping
 │   └── Batch.lua         -- Batch multiple events into a single network call
 ├── examples/             -- Working examples for every feature
 ├── tests/                -- Studio test runner

@@ -74,6 +74,12 @@ export type Computed<T> = {
 	connection: RBXScriptConnection?,
 }
 
+export type Channel = {
+	name: string,
+	members: {[Player]: boolean},
+	memberCount: number,
+}
+
 export type BatchEvent = {
 	name: string,
 	args: {any},

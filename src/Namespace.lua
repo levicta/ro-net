@@ -15,6 +15,7 @@ local Observable = require(script.Parent.Observable)
 local PlayerObservable = require(script.Parent.PlayerObservable)
 local TeamObservable = require(script.Parent.TeamObservable)
 local Computed = require(script.Parent.Computed)
+local Channel = require(script.Parent.Channel)
 
 local Namespace = {}
 Namespace.__index = Namespace
@@ -43,6 +44,7 @@ export type Namespace = {
 	computed: (self: Namespace, remote: string, fn: (...any) -> any, dependencies: {any}) -> Computed.Computed<any>,
 	playerComputed: (self: Namespace, remote: string, fn: (...any) -> any, dependencies: {any}) -> Computed.Computed<any>,
 	teamComputed: (self: Namespace, remote: string, fn: (...any) -> any, dependencies: {any}) -> Computed.Computed<any>,
+	channel: (self: Namespace, name: string) -> Channel.Channel,
 }
 
 local function qualify(ns: string, name: string): string
@@ -226,6 +228,11 @@ end
 function Namespace:teamComputed(remote: string, fn: (...any) -> any, dependencies: {any}): Computed.Computed<any>
 	local fullName = qualify(self.name, remote)
 	return Computed.team(fullName, fn, dependencies)
+end
+
+function Namespace:channel(name: string): Channel.Channel
+	local fullName = qualify(self.name, name)
+	return Channel.new(fullName)
 end
 
 return Namespace
