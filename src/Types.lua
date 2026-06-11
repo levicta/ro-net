@@ -39,6 +39,11 @@ export type Observable<T> = {
 	playerAddedConnection: RBXScriptConnection?,
 }
 
+export type BatchEvent = {
+	name: string,
+	args: {any},
+}
+
 export type Config = {
 	strictMode: boolean?,
 	defaultTimeout: number?,

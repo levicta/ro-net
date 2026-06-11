@@ -29,6 +29,9 @@ local Serializer = require(script.Serializer)
 local Profiler = require(script.Profiler)
 local Zone = require(script.Zone)
 local Observable = require(script.Observable)
+local Batch = require(script.Batch)
+
+Batch.init()
 
 local RoNet = {}
 
@@ -46,6 +49,7 @@ RoNet.Serializer = Serializer
 RoNet.Profiler = Profiler
 RoNet.Zone = Zone
 RoNet.Observable = Observable
+RoNet.Batch = Batch
 
 -- Configuration
 function RoNet.configure(config: Types.Config)
@@ -133,6 +137,18 @@ if Internal.isServer then
 
 	function RoNet.fireExceptInZone(name: string, zoneData: Types.Zone, exceptPlayer: Player, ...)
 		return Server.fireExceptInZone(name, zoneData, exceptPlayer, ...)
+	end
+
+	function RoNet.fireBatch(player: Player, events: {Types.BatchEvent})
+		return Server.fireBatch(player, events)
+	end
+
+	function RoNet.fireBatchAll(events: {Types.BatchEvent})
+		return Server.fireBatchAll(events)
+	end
+
+	function RoNet.fireBatchExcept(exceptPlayer: Player, events: {Types.BatchEvent})
+		return Server.fireBatchExcept(exceptPlayer, events)
 	end
 
 	function RoNet.onInvoke(name: string, handler: (player: Player, ...any) -> any, middleware: Types.Middleware?)

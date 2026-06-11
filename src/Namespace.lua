@@ -32,6 +32,9 @@ export type Namespace = {
 	defineMany: (self: Namespace, definitions: {{name: string, type: Types.RemoteType}}) -> (),
 	isDefined: (self: Namespace, remote: string) -> boolean,
 	observable: (self: Namespace, remote: string, initialValue: any) -> Observable.Observable<any>,
+	fireBatch: (self: Namespace, player: Player, events: {Types.BatchEvent}) -> (),
+	fireBatchAll: (self: Namespace, events: {Types.BatchEvent}) -> (),
+	fireBatchExcept: (self: Namespace, exceptPlayer: Player, events: {Types.BatchEvent}) -> (),
 }
 
 local function qualify(ns: string, name: string): string
@@ -157,6 +160,39 @@ end
 function Namespace:observable(remote: string, initialValue: any): Observable.Observable<any>
 	local fullName = qualify(self.name, remote)
 	return Observable.new(fullName, initialValue)
+end
+
+function Namespace:fireBatch(player: Player, events: {Types.BatchEvent})
+	local fullNameEvents: {Types.BatchEvent} = {}
+	for _, event in ipairs(events) do
+		table.insert(fullNameEvents, {
+			name = qualify(self.name, event.name),
+			args = event.args,
+		})
+	end
+	Server.fireBatch(player, fullNameEvents)
+end
+
+function Namespace:fireBatchAll(events: {Types.BatchEvent})
+	local fullNameEvents: {Types.BatchEvent} = {}
+	for _, event in ipairs(events) do
+		table.insert(fullNameEvents, {
+			name = qualify(self.name, event.name),
+			args = event.args,
+		})
+	end
+	Server.fireBatchAll(fullNameEvents)
+end
+
+function Namespace:fireBatchExcept(exceptPlayer: Player, events: {Types.BatchEvent})
+	local fullNameEvents: {Types.BatchEvent} = {}
+	for _, event in ipairs(events) do
+		table.insert(fullNameEvents, {
+			name = qualify(self.name, event.name),
+			args = event.args,
+		})
+	end
+	Server.fireBatchExcept(exceptPlayer, fullNameEvents)
 end
 
 return Namespace

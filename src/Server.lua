@@ -13,6 +13,7 @@ local Server = {}
 local eventHandlers: {[string]: Types.HandlerEntry} = {}
 local invokeHandlers: {[string]: Types.HandlerEntry} = {}
 local Zone = require(script.Parent.Zone)
+local Batch = require(script.Parent.Batch)
 
 local function parseMiddleware(middleware: Types.Middleware?): {Types.MiddlewareFn}
 	local list: {Types.MiddlewareFn} = {}
@@ -208,6 +209,18 @@ function Server.fireExceptInZone(name: string, zoneData: Types.Zone, exceptPlaye
 			end)
 		end
 	end
+end
+
+function Server.fireBatch(player: Player, events: {Types.BatchEvent})
+	Batch.send(player, events)
+end
+
+function Server.fireBatchAll(events: {Types.BatchEvent})
+	Batch.sendAll(events)
+end
+
+function Server.fireBatchExcept(exceptPlayer: Player, events: {Types.BatchEvent})
+	Batch.sendExcept(exceptPlayer, events)
 end
 
 function Server.onInvoke(name: string, handler: (player: Player, ...any) -> any, middleware: Types.Middleware?)

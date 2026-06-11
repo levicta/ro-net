@@ -82,6 +82,23 @@ function Client.off(name: string)
 	end
 end
 
+function Client.dispatch(name: string, player: Player?, ...)
+	local handlerEntry = eventHandlers[name]
+	if not handlerEntry then
+		return
+	end
+
+	local payload = {...}
+	task.spawn(function()
+		local success, result = pcall(function()
+			return handlerEntry.handler(table.unpack(payload))
+		end)
+		if not success then
+			warn(string.format("[RoNet] Error in batch-dispatched client handler for '%s': %s", name, tostring(result)))
+		end
+	end)
+end
+
 function Client.fire(name: string, ...)
 	local remote = Internal.getRemote(name) :: RemoteEvent?
 	if not remote then

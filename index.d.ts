@@ -18,6 +18,11 @@ declare namespace RoNet {
 		destroy(): void;
 	}
 
+	export interface BatchEvent {
+		name: string;
+		args: Array<unknown>;
+	}
+
 	export interface Context {
 		readonly player: Player | undefined;
 		readonly remote: string;
@@ -77,12 +82,8 @@ declare namespace RoNet {
 		function getPlayersInZone(zoneData: ZoneData): Array<Player>;
 	}
 
-	export namespace ObservableNamespace {
-		function new<T>(name: string, initialValue: T): RoNet.Observable<T>;
-	}
-
 	export namespace ObservableStatic {
-		function createObservable<T>(name: string, initialValue: T): RoNet.Observable<T>;
+		function create<T>(name: string, initialValue: T): RoNet.Observable<T>;
 	}
 }
 
@@ -109,6 +110,9 @@ interface RoNetServer {
 	fireExcept(name: string, exceptPlayer: Player, ...args: Array<unknown>): void;
 	fireInZone(name: string, zoneData: RoNet.ZoneData, ...args: Array<unknown>): void;
 	fireExceptInZone(name: string, zoneData: RoNet.ZoneData, exceptPlayer: Player, ...args: Array<unknown>): void;
+	fireBatch(player: Player, events: Array<RoNet.BatchEvent>): void;
+	fireBatchAll(events: Array<RoNet.BatchEvent>): void;
+	fireBatchExcept(exceptPlayer: Player, events: Array<RoNet.BatchEvent>): void;
 	onInvoke(name: string, handler: (player: Player, ...args: Array<unknown>) => unknown, middleware?: RoNet.Middleware): void;
 	invoke<T>(name: string, player: Player, ...args: Array<unknown>): T | undefined;
 	invokeAsync<T>(name: string, player: Player, timeout?: number, ...args: Array<unknown>): RoNet.Promise<T>;

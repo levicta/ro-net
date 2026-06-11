@@ -185,6 +185,35 @@ local Game = Net.namespace("Game")
 local Round = Game:observable("RoundNumber", 0)
 ```
 
+#### `Net.fireBatch(player, events)` / `Net.fireBatchAll(events)` / `Net.fireBatchExcept(exceptPlayer, events)` *(Server only)*
+Send multiple different events in a single network call to reduce per-RemoteEvent overhead.
+
+```lua
+Net.fireBatch(player, {
+    {"HealthChanged", 75},
+    {"PositionChanged", Vector3.new(10, 5, 20)},
+    {"StatusEffect", "poison"},
+})
+
+Net.fireBatchAll({
+    {"Announcement", "Round starting!"},
+    {"TimerUpdate", 60},
+})
+
+Net.fireBatchExcept(excludedPlayer, {
+    {"ChatMessage", sender.Name, message},
+})
+```
+
+With namespaces:
+```lua
+local Combat = Net.namespace("Combat")
+Combat:fireBatch(player, {
+    {"Damage", targetId, 25},
+    {"Heal", targetId, 10},
+})
+```
+
 #### `Net.onInvoke(name, handler, middleware?)`
 Handle a RemoteFunction invocation.
 
@@ -733,7 +762,8 @@ ro-net/
 │   ├── Profiler.lua      -- Network performance metrics
 │   ├── Types.lua         -- Luau type definitions
 │   ├── Zone.lua          -- Spatial zone filtering for interest management
-│   └── Observable.lua    -- Reactive state synchronization helpers
+│   ├── Observable.lua    -- Reactive state synchronization helpers
+│   └── Batch.lua         -- Batch multiple events into a single network call
 ├── examples/             -- Working examples for every feature
 ├── tests/                -- Studio test runner
 ├── demo/                 -- Full working game demo
