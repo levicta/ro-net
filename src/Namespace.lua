@@ -14,6 +14,7 @@ local Types = require(script.Parent.Types)
 local Observable = require(script.Parent.Observable)
 local PlayerObservable = require(script.Parent.PlayerObservable)
 local TeamObservable = require(script.Parent.TeamObservable)
+local Computed = require(script.Parent.Computed)
 
 local Namespace = {}
 Namespace.__index = Namespace
@@ -39,6 +40,9 @@ export type Namespace = {
 	fireBatchExcept: (self: Namespace, exceptPlayer: Player, events: {Types.BatchEvent}) -> (),
 	playerObservable: (self: Namespace, remote: string, initialValue: any) -> PlayerObservable.PlayerObservable<any>,
 	teamObservable: (self: Namespace, remote: string, initialValue: any) -> TeamObservable.TeamObservable<any>,
+	computed: (self: Namespace, remote: string, fn: (...any) -> any, dependencies: {any}) -> Computed.Computed<any>,
+	playerComputed: (self: Namespace, remote: string, fn: (...any) -> any, dependencies: {any}) -> Computed.Computed<any>,
+	teamComputed: (self: Namespace, remote: string, fn: (...any) -> any, dependencies: {any}) -> Computed.Computed<any>,
 }
 
 local function qualify(ns: string, name: string): string
@@ -207,6 +211,21 @@ end
 function Namespace:teamObservable(remote: string, initialValue: any): TeamObservable.TeamObservable<any>
 	local fullName = qualify(self.name, remote)
 	return TeamObservable.new(fullName, initialValue)
+end
+
+function Namespace:computed(remote: string, fn: (...any) -> any, dependencies: {any}): Computed.Computed<any>
+	local fullName = qualify(self.name, remote)
+	return Computed.new(fullName, fn, dependencies)
+end
+
+function Namespace:playerComputed(remote: string, fn: (...any) -> any, dependencies: {any}): Computed.Computed<any>
+	local fullName = qualify(self.name, remote)
+	return Computed.player(fullName, fn, dependencies)
+end
+
+function Namespace:teamComputed(remote: string, fn: (...any) -> any, dependencies: {any}): Computed.Computed<any>
+	local fullName = qualify(self.name, remote)
+	return Computed.team(fullName, fn, dependencies)
 end
 
 return Namespace

@@ -32,6 +32,24 @@ declare namespace RoNet {
 		destroy(): void;
 	}
 
+	export interface Computed<T = any> {
+		get(): T;
+		onChange(callback: (value: T) => void): void;
+		destroy(): void;
+	}
+
+	export interface PlayerComputed<T = any> {
+		get(player?: Player): T;
+		onChange(callback: (player: Player, value: T) => void): void;
+		destroy(): void;
+	}
+
+	export interface TeamComputed<T = any> {
+		get(team?: Team): T;
+		onChange(callback: (team: Team, value: T) => void): void;
+		destroy(): void;
+	}
+
 	export interface BatchEvent {
 		name: string;
 		args: Array<unknown>;
@@ -107,6 +125,12 @@ declare namespace RoNet {
 	export namespace TeamObservableStatic {
 		function create<T>(name: string, initialValue: T): RoNet.TeamObservable<T>;
 	}
+
+	export namespace ComputedStatic {
+		function create<T>(name: string, fn: (...args: Array<unknown>) => T, dependencies: Array<any>): RoNet.Computed<T>;
+		function createPlayer<T>(name: string, fn: (player: Player, ...args: Array<unknown>) => T, dependencies: Array<any>): RoNet.PlayerComputed<T>;
+		function createTeam<T>(name: string, fn: (team: Team, ...args: Array<unknown>) => T, dependencies: Array<any>): RoNet.TeamComputed<T>;
+	}
 }
 
 // Server API
@@ -122,10 +146,14 @@ interface RoNetServer {
 	readonly Observable: typeof RoNet.ObservableStatic;
 	readonly PlayerObservable: typeof RoNet.PlayerObservableStatic;
 	readonly TeamObservable: typeof RoNet.TeamObservableStatic;
+	readonly Computed: typeof RoNet.ComputedStatic;
 
 	readonly observable: <T>(name: string, initialValue: T) => RoNet.Observable<T>;
 	readonly playerObservable: <T>(name: string, initialValue: T) => RoNet.PlayerObservable<T>;
 	readonly teamObservable: <T>(name: string, initialValue: T) => RoNet.TeamObservable<T>;
+	readonly computed: <T>(name: string, fn: (...args: Array<unknown>) => T, dependencies: Array<any>) => RoNet.Computed<T>;
+	readonly playerComputed: <T>(name: string, fn: (player: Player, ...args: Array<unknown>) => T, dependencies: Array<any>) => RoNet.PlayerComputed<T>;
+	readonly teamComputed: <T>(name: string, fn: (team: Team, ...args: Array<unknown>) => T, dependencies: Array<any>) => RoNet.TeamComputed<T>;
 
 	configure(config: RoNet.Config): void;
 
@@ -160,10 +188,14 @@ interface RoNetClient {
 	readonly Observable: typeof RoNet.ObservableStatic;
 	readonly PlayerObservable: typeof RoNet.PlayerObservableStatic;
 	readonly TeamObservable: typeof RoNet.TeamObservableStatic;
+	readonly Computed: typeof RoNet.ComputedStatic;
 
 	readonly observable: <T>(name: string, initialValue: T) => RoNet.Observable<T>;
 	readonly playerObservable: <T>(name: string, initialValue: T) => RoNet.PlayerObservable<T>;
 	readonly teamObservable: <T>(name: string, initialValue: T) => RoNet.TeamObservable<T>;
+	readonly computed: <T>(name: string, fn: (...args: Array<unknown>) => T, dependencies: Array<any>) => RoNet.Computed<T>;
+	readonly playerComputed: <T>(name: string, fn: (player: Player, ...args: Array<unknown>) => T, dependencies: Array<any>) => RoNet.PlayerComputed<T>;
+	readonly teamComputed: <T>(name: string, fn: (team: Team, ...args: Array<unknown>) => T, dependencies: Array<any>) => RoNet.TeamComputed<T>;
 
 	configure(config: RoNet.Config): void;
 

@@ -64,6 +64,16 @@ export type TeamObservable<T> = {
 	_teamConnections: {[Player]: RBXScriptConnection}?,
 }
 
+export type Computed<T> = {
+	name: string,
+	fn: (...any) -> any,
+	dependencies: {any},
+	value: T?,
+	onChangeCallbacks: {(...any) -> ()},
+	connections: {RBXScriptConnection},
+	connection: RBXScriptConnection?,
+}
+
 export type BatchEvent = {
 	name: string,
 	args: {any},

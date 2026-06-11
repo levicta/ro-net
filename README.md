@@ -241,6 +241,47 @@ local Game = Net.namespace("Game")
 local TeamScore = Game:teamObservable("TeamScore", 0)
 ```
 
+#### `Net.computed(name, fn, dependencies)` / `Net.playerComputed(name, fn, dependencies)` / `Net.teamComputed(name, fn, dependencies)`
+Create a read-only observable that automatically recalculates when its source observables change.
+
+**Global computed:**
+```lua
+local RedScore = Net.observable("RedScore", 0)
+local BlueScore = Net.observable("BlueScore", 0)
+local TotalScore = Net.computed("TotalScore", function(red, blue)
+    return red + blue
+end, {RedScore, BlueScore})
+
+TotalScore:get() -- 0
+TotalScore:onChange(function(total)
+    print("Total score:", total)
+end)
+
+RedScore:set(10) -- TotalScore auto-recalculates to 10
+```
+
+**Player computed:**
+```lua
+local PlayerLevel = Net.playerObservable("PlayerLevel", 1)
+local PlayerMultiplier = Net.playerObservable("PlayerMultiplier", 1)
+local PlayerPower = Net.playerComputed("PlayerPower", function(player, level, multiplier)
+    return level * multiplier
+end, {PlayerLevel, PlayerMultiplier})
+
+PlayerPower:get(player)
+```
+
+**Team computed:**
+```lua
+local TeamAttack = Net.teamObservable("TeamAttack", 10)
+local TeamDefense = Net.teamObservable("TeamDefense", 5)
+local TeamPower = Net.teamComputed("TeamPower", function(team, attack, defense)
+    return attack + defense
+end, {TeamAttack, TeamDefense})
+
+TeamPower:get(team)
+```
+
 #### `Net.fireBatch(player, events)` / `Net.fireBatchAll(events)` / `Net.fireBatchExcept(exceptPlayer, events)` *(Server only)*
 Send multiple different events in a single network call to reduce per-RemoteEvent overhead.
 
@@ -821,6 +862,7 @@ ro-net/
 │   ├── Observable.lua    -- Reactive state synchronization helpers
 │   ├── PlayerObservable.lua -- Per-player reactive state synchronization
 │   ├── TeamObservable.lua -- Per-team reactive state synchronization
+│   ├── Computed.lua      -- Derived/computed observable helpers
 │   └── Batch.lua         -- Batch multiple events into a single network call
 ├── examples/             -- Working examples for every feature
 ├── tests/                -- Studio test runner

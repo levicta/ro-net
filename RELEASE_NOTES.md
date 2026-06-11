@@ -1,8 +1,17 @@
-# RoNet v1.4.0
+# RoNet v1.5.0
 
-**Adds per-team observable state synchronization.**
+**Adds derived/computed observables for reactive state architecture.**
 
 ## What's New
+
+### Added (v1.5.0)
+- **`Net.computed(name, fn, dependencies)`** — Read-only global observable that auto-recalculates when dependencies change
+- **`Net.playerComputed(name, fn, dependencies)`** — Per-player computed observable
+- **`Net.teamComputed(name, fn, dependencies)`** — Per-team computed observable
+- Dependency change triggers automatic recalculation and broadcast
+- `.get()` and `.onChange(callback)` work the same as regular observables
+- `.destroy()` cleans up dependency subscriptions
+- Namespace support: `Game:computed("TotalScore", fn, deps)`
 
 ### Added (v1.4.0)
 - **`Net.teamObservable(name, initialValue)`** — Reactive state that stores a separate value per-team and auto-syncs only to members of that team
@@ -78,7 +87,7 @@ git clone https://github.com/levicta/ro-net.git
 
 **Wally:**
 ```toml
-ro-net = "levicta/ro-net@1.4.0"
+ro-net = "levicta/ro-net@1.5.0"
 ```
 
 ## Quick Start
@@ -86,15 +95,17 @@ ro-net = "levicta/ro-net@1.4.0"
 ```lua
 local Net = require(ReplicatedStorage.RoNet)
 
--- Server
-local TeamScore = Net.teamObservable("TeamScore", 0)
-TeamScore:set(team, 150)
+local RedScore = Net.observable("RedScore", 0)
+local BlueScore = Net.observable("BlueScore", 0)
+local TotalScore = Net.computed("TotalScore", function(red, blue)
+    return red + blue
+end, {RedScore, BlueScore})
 
--- Client
-local TeamScore = Net.teamObservable("TeamScore", 0)
-TeamScore:onChange(function(newVal)
-    updateTeamUI(newVal)
+TotalScore:onChange(function(total)
+    print("Total score:", total)
 end)
+
+RedScore:set(10) -- TotalScore auto-recalculates
 ```
 
 ## Full Changelog
