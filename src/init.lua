@@ -28,6 +28,7 @@ local Utilities = require(script.Utilities)
 local Serializer = require(script.Serializer)
 local Profiler = require(script.Profiler)
 local Zone = require(script.Zone)
+local Observable = require(script.Observable)
 
 local RoNet = {}
 
@@ -44,6 +45,7 @@ RoNet.Utilities = Utilities
 RoNet.Serializer = Serializer
 RoNet.Profiler = Profiler
 RoNet.Zone = Zone
+RoNet.Observable = Observable
 
 -- Configuration
 function RoNet.configure(config: Types.Config)
@@ -96,6 +98,11 @@ end
 
 function RoNet.profilerReport(): string
 	return Profiler.report()
+end
+
+-- Observable factory
+function RoNet.observable(name: string, initialValue: any): Observable.Observable<any>
+	return Observable.new(name, initialValue)
 end
 
 -- Context-aware unified API

@@ -11,6 +11,7 @@ local Internal = require(script.Parent.Internal)
 local Server = require(script.Parent.Server)
 local Client = require(script.Parent.Client)
 local Types = require(script.Parent.Types)
+local Observable = require(script.Parent.Observable)
 
 local Namespace = {}
 Namespace.__index = Namespace
@@ -30,6 +31,7 @@ export type Namespace = {
 	define: (self: Namespace, remote: string, remoteType: Types.RemoteType) -> (RemoteEvent | RemoteFunction)?,
 	defineMany: (self: Namespace, definitions: {{name: string, type: Types.RemoteType}}) -> (),
 	isDefined: (self: Namespace, remote: string) -> boolean,
+	observable: (self: Namespace, remote: string, initialValue: any) -> Observable.Observable<any>,
 }
 
 local function qualify(ns: string, name: string): string
@@ -150,6 +152,11 @@ end
 
 function Namespace:isDefined(remote: string): boolean
 	return Internal.isDefined(qualify(self.name, remote))
+end
+
+function Namespace:observable(remote: string, initialValue: any): Observable.Observable<any>
+	local fullName = qualify(self.name, remote)
+	return Observable.new(fullName, initialValue)
 end
 
 return Namespace

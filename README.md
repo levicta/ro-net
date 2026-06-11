@@ -158,6 +158,33 @@ local players = Net.Zone.getPlayersInZone(zone)
 local inZone = Net.Zone.isPlayerInZone(player, zone)
 ```
 
+#### `Net.observable(name, initialValue)`
+Create a reactive state variable that auto-syncs to all clients (including new joiners).
+
+**Server:**
+```lua
+local Round = Net.observable("RoundNumber", 0)
+Round:set(3)
+Round:onChange(function(newVal)
+    print("Round is now", newVal)
+end)
+```
+
+**Client:**
+```lua
+local Round = Net.observable("RoundNumber", 0)
+print(Round:get()) -- 0 (initial value until first sync)
+Round:onChange(function(newVal)
+    updateUI(newVal)
+end)
+```
+
+With namespaces:
+```lua
+local Game = Net.namespace("Game")
+local Round = Game:observable("RoundNumber", 0)
+```
+
 #### `Net.onInvoke(name, handler, middleware?)`
 Handle a RemoteFunction invocation.
 
@@ -705,7 +732,8 @@ ro-net/
 │   ├── Serializer.lua    -- Roblox type serialization
 │   ├── Profiler.lua      -- Network performance metrics
 │   ├── Types.lua         -- Luau type definitions
-│   └── Zone.lua          -- Spatial zone filtering for interest management
+│   ├── Zone.lua          -- Spatial zone filtering for interest management
+│   └── Observable.lua    -- Reactive state synchronization helpers
 ├── examples/             -- Working examples for every feature
 ├── tests/                -- Studio test runner
 ├── demo/                 -- Full working game demo

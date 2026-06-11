@@ -30,6 +30,15 @@ export type Zone = {
 	radius: number,
 }
 
+export type Observable<T> = {
+	name: string,
+	initialValue: T,
+	value: T,
+	onChangeCallbacks: {(...any) -> ()},
+	connection: RBXScriptConnection?,
+	playerAddedConnection: RBXScriptConnection?,
+}
+
 export type Config = {
 	strictMode: boolean?,
 	defaultTimeout: number?,

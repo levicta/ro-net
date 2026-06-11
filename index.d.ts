@@ -11,6 +11,13 @@ declare namespace RoNet {
 		readonly radius: number;
 	}
 
+	export interface Observable<T = any> {
+		set(value: T): void;
+		get(): T;
+		onChange(callback: (value: T) => void): void;
+		destroy(): void;
+	}
+
 	export interface Context {
 		readonly player: Player | undefined;
 		readonly remote: string;
@@ -69,6 +76,14 @@ declare namespace RoNet {
 		function isPlayerInZone(player: Player, zoneData: ZoneData): boolean;
 		function getPlayersInZone(zoneData: ZoneData): Array<Player>;
 	}
+
+	export namespace ObservableNamespace {
+		function new<T>(name: string, initialValue: T): RoNet.Observable<T>;
+	}
+
+	export namespace ObservableStatic {
+		function createObservable<T>(name: string, initialValue: T): RoNet.Observable<T>;
+	}
 }
 
 // Server API
@@ -81,6 +96,9 @@ interface RoNetServer {
 	readonly Promise: typeof RoNet.PromiseStatic;
 	readonly Bindable: typeof RoNet.Bindable;
 	readonly Zone: typeof RoNet.Zone;
+	readonly Observable: typeof RoNet.ObservableStatic;
+
+	readonly observable: <T>(name: string, initialValue: T) => RoNet.Observable<T>;
 
 	configure(config: RoNet.Config): void;
 
@@ -109,6 +127,9 @@ interface RoNetClient {
 	readonly Promise: typeof RoNet.PromiseStatic;
 	readonly Bindable: typeof RoNet.Bindable;
 	readonly Zone: typeof RoNet.Zone;
+	readonly Observable: typeof RoNet.ObservableStatic;
+
+	readonly observable: <T>(name: string, initialValue: T) => RoNet.Observable<T>;
 
 	configure(config: RoNet.Config): void;
 
